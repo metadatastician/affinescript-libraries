@@ -1,0 +1,143 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= AffineScript Libraries
+:toc:
+:toc-placement: preamble
+
+image:https://img.shields.io/badge/License-MPL--2.0-blue.svg[MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+image:https://img.shields.io/badge/Language-AffineScript-blueviolet.svg[AffineScript,link="https://github.com/hyperpolymath/affinescript"]
+image:https://img.shields.io/badge/Target-WebAssembly-654ff0.svg[WebAssembly,link="https://webassembly.org/"]
+
+== What this is
+
+AffineScript Libraries is a collection of reusable libraries for the
+https://github.com/hyperpolymath/affinescript[AffineScript] programming language.
+
+This repository provides:
+
+* **KYAML Processing** — Kubernetes-native YAML parsing, querying, and manipulation
+* **Query Languages** — jq-like and custom query DSLs for data extraction
+* **Lint Rules** — Pluggable linting infrastructure for Kubernetes manifests
+* **Utility Libraries** — Common data structures and algorithms
+* **FFI Bindings** — Foreign function interfaces for interoperability
+
+== Quick start
+
+[source,bash]
+----
+# Clone the repository
+git clone https://github.com/metadatastician/affinescript-libraries.git
+cd affinescript-libraries
+
+# Build all libraries
+just build
+
+# Run tests
+just test
+
+# See available libraries
+ls src/
+----
+
+== Library Structure
+
+[cols="1,3"]
+|===
+| Library | Description
+
+| `Kyaml/` | Kubernetes YAML processing (core kcq functionality)
+| `Kyaml/Query/` | Query language implementations
+| `Kyaml/Lint/` | Lint rule collections
+| `Kyaml/Schema/` | Kubernetes schema definitions
+| `Data/` | Generic data structures (maps, sets, vectors)
+| `Text/` | Text processing and parsing utilities
+| `Json/` | JSON serialization/deserialization
+| `Yaml/` | Generic YAML support (non-K8s)
+|===
+
+== Usage with kcq
+
+This library is the upstream source for the kcq tool's core functionality.
+The https://github.com/metadatastician/kcq[kcq] tool uses libraries from here.
+
+To use these libraries in your own AffineScript project:
+
+[source,affine]
+----
+import Kyaml
+import Kyaml.Query
+import Kyaml.Lint.RequiredFields
+
+// Parse and lint a Kubernetes manifest
+let content = readFile "deployment.yaml"
+let result = Kyaml.parse content
+
+match result with
+| ParseSuccess file ->
+    let issues = Kyaml.lintFile content
+    if issues != [] then
+      printIssues issues
+    else
+      let json = Kyaml.toJson file
+      print json
+| ParseFailure errors ->
+    printErrors errors
+----
+
+== Building
+
+[source,bash]
+----
+# Build all libraries
+just build
+
+# Build a specific library
+just build-kyaml
+
+# Run tests
+just test
+
+# Run tests for a specific library
+just test-kyaml
+----
+
+== Project Status
+
+[cols="1,2,1"]
+|===
+| Component | Status | Notes
+
+| Kyaml.Parser | 🟡 Draft | Basic parsing in AffineScript
+| Kyaml.Lexer | 🟡 Draft | Tokenization
+| Kyaml.Ast | 🟡 Draft | AST definitions
+| Kyaml.Query | 🟢 Planning | Query language design
+| Kyaml.Lint | 🟢 Planning | Lint rule framework
+| Data.Structures | 🟢 Planning | Maps, sets, vectors
+|===
+
+== Contributing
+
+See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc] for development guidelines.
+
+== License
+
+All code in this repository is licensed under MPL-2.0.
+
+See link:LICENSE[LICENSE] for the full license text.
+
+== Related Projects
+
+* https://github.com/hyperpolymath/affinescript[AffineScript] — The language
+* https://github.com/metadatastician/kcq[kcq] — Kubernetes Configuration Query tool
+* https://github.com/metadatastician/affinescript-ecosystem[affinescript-ecosystem] — Ecosystem coordination
+
+== Repository Metadata
+
+[cols="1,2"]
+|===
+| Owner | metadatastician
+| Primary Language | AffineScript
+| Target | WebAssembly
+| RSR Tier | 2
+|===

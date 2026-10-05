@@ -1,0 +1,315 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// Kyaml.Lexer — Lexical analyzer for KYAML
+//
+// This module provides lexing functionality for Kubernetes YAML.
+// It tokenizes YAML input into a stream of tokens for parsing.
+
+module Kyaml.Lexer
+
+import Kyaml.Ast
+
+// ============================================================================
+// Token Types
+// ============================================================================
+
+/**
+ * Represents a token in the KYAML token stream.
+ */
+type Token
+  = TString of string, SourceSpan
+  | TInt of int, SourceSpan
+  | TFloat of float, SourceSpan
+  | TBool of bool, SourceSpan
+  | TNull of SourceSpan
+  | TAnchor of string, SourceSpan
+  | TAlias of string, SourceSpan
+  | TTag of string, SourceSpan
+  | TScalar of string, SourceSpan  // Plain scalar (no quotes)
+  | TFlowSequenceStart of SourceSpan
+  | TFlowSequenceEnd of SourceSpan
+  | TFlowMappingStart of SourceSpan
+  | TFlowMappingEnd of SourceSpan
+  | TBlockSequenceStart of SourceSpan  // '-'
+  | TBlockMappingStart of SourceSpan  // ':'
+  | TKeySeparator of SourceSpan  // ':'
+  | TValueSeparator of SourceSpan  // ','
+  | TDocStart of SourceSpan  // '---'
+  | TDocEnd of SourceSpan  // '...'
+  | TDirective of string, SourceSpan
+  | TComment of string, SourceSpan
+  | TNewline of SourceSpan
+  | TIndic of int, SourceSpan  // Indentation token
+  | TEof
+
+/**
+ * Represents a source span (location range).
+ */
+type SourceSpan = {
+  start: SourceLocation,
+  end: SourceLocation
+}
+
+/**
+ * Represents a source location.
+ */
+type SourceLocation = {
+  line: int,
+  column: int,
+  offset: int
+}
+
+// ============================================================================
+// Lexer State
+// ============================================================================
+
+/**
+ * Represents the state of the lexer.
+ */
+type LexerState = {
+  input: string,
+  position: int,
+  line: int,
+  column: int,
+  indentationStack: list<int>
+}
+
+/**
+ * Create a new lexer state.
+ */
+newLexerState :: string -> LexerState
+newLexerState input = {
+  input = input,
+  position = 0,
+  line = 1,
+  column = 1,
+  indentationStack = [0]
+}
+
+// ============================================================================
+// Lexer Functions
+// ============================================================================
+
+/**
+ * Lex a string into a list of tokens.
+ * Returns a Result containing either the token list or a lex error.
+ */
+lex :: string -> Result<list<Token>, ParseError>
+lex input = 
+  let state = newLexerState input
+  let rec loop state tokens = 
+    if atEnd state then
+      Ok (reverse tokens)
+    else
+      match nextToken state with
+        | Ok (token, newState) -> loop newState (token :: tokens)
+        | Err error -> Err error
+  in loop state []
+
+/**
+ * Get the next token from the input.
+ */
+nextToken :: LexerState -> Result<(Token, LexerState), ParseError>
+nextToken state = 
+  skipWhitespace state |> 
+  case Ok newState of
+    peekChar newState |> 
+    case Some c of
+      | c == '#' -> commentToken newState
+      | c == '\"' || c == "'" -> stringToken newState
+      | c == '-' && peekNextChar newState == '-' -> directiveToken newState
+      | c == '-' -> blockSequenceToken newState
+      | c == '[' -> flowSequenceStart newState
+      | c == ']' -> Ok (TFlowSequenceEnd (getSpan state newState), newState)
+      | c == '{' -> Ok (TFlowMappingStart (getSpan state newState), newState)
+      | c == '}' -> Ok (TFlowMappingEnd (getSpan state newState), newState)
+      | c == ':' -> mappingKeyToken newState
+      | c == ',' -> Ok (TValueSeparator (getSpan state newState), newState)
+      | isDigit c -> numberToken newState
+      | isAlpha c -> identifierToken newState
+      | _ -> Err (makeError state ("Unexpected character: " ++ stringOfChar c))
+    | None -> Ok (TEof, newState)
+  | Err error -> Err error
+
+where
+  skipWhitespace state = 
+    let rec loop state = 
+      if atEnd state then
+        Ok state
+      else
+        let c = peekChar state
+        case c of
+          Some ' ' | Some '\t' -> loop (advance state)
+          Some '\n' -> loop (advanceNewline state)
+          Some '#' -> skipComment state
+          _ -> Ok state
+    in loop state
+  
+  skipComment state = 
+    let rec loop state = 
+      if atEnd state then
+        Ok state
+      else
+        let c = peekChar state
+        case c of
+          Some '\n' -> Ok (advanceNewline state)
+          _ -> loop (advance state)
+    in loop state
+  
+  commentToken state = 
+    let start = currentLocation state
+    let rec loop state = 
+      if atEnd state then
+        Ok (TComment (substring start.position state.position), getSpan start state)
+      else
+        let c = peekChar state
+        case c of
+          Some '\n' -> Ok (TComment (substring start.position state.position) |> fst, advanceNewline state |> snd)
+          _ -> loop (advance state)
+    in loop state
+  
+  stringToken state = Err (makeError state "String token: Not yet implemented")
+  directiveToken state = Err (makeError state "Directive token: Not yet implemented")
+  blockSequenceToken state = Err (makeError state "Block sequence token: Not yet implemented")
+  mappingKeyToken state = Err (makeError state "Mapping key token: Not yet implemented")
+  numberToken state = Err (makeError state "Number token: Not yet implemented")
+  identifierToken state = Err (makeError state "Identifier token: Not yet implemented")
+  flowSequenceStart state = Err (makeError state "Flow sequence start: Not yet implemented")
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Check if at end of input.
+ */
+atEnd :: LexerState -> bool
+atEnd state = state.position >= length state.input
+
+/**
+ * Peek at the current character without consuming.
+ */
+peekChar :: LexerState -> Option<char>
+peekChar state = 
+  if atEnd state then None
+  else Some (state.input[state.position])
+
+/**
+ * Peek at the next character without consuming.
+ */
+peekNextChar :: LexerState -> Option<char>
+peekNextChar state = 
+  if state.position + 1 >= length state.input then None
+  else Some (state.input[state.position + 1])
+
+/**
+ * Advance the lexer by one character.
+ */
+advance :: LexerState -> LexerState
+advance state = {
+  state | 
+    position = state.position + 1,
+    column = state.column + 1
+}
+
+/**
+ * Advance the lexer past a newline.
+ */
+advanceNewline :: LexerState -> LexerState
+advanceNewline state = {
+  state | 
+    position = state.position + 1,
+    line = state.line + 1,
+    column = 1
+}
+
+/**
+ * Get the current location.
+ */
+currentLocation :: LexerState -> SourceLocation
+currentLocation state = {
+  line = state.line,
+  column = state.column,
+  offset = state.position
+}
+
+/**
+ * Get a span from start to current location.
+ */
+getSpan :: SourceLocation -> LexerState -> SourceSpan
+getSpan start state = {
+  start = start,
+  end = currentLocation state
+}
+
+/**
+ * Get the length of a string.
+ */
+length :: string -> int
+length s = 
+  let rec loop acc i = 
+    if i >= stringLength s then acc
+    else loop (acc + 1) (i + 1)
+  in loop 0 0
+
+stringLength s = 
+  let rec loop acc i = 
+    if i >= 1000 then acc  // Safety limit
+    else if i >= length s then acc
+    else loop (acc + 1) (i + 1)
+  in loop 0 0
+
+/**
+ * Get a substring.
+ */
+substring :: string -> int -> int -> string
+substring s start end = 
+  if start >= end || start >= length s then ""
+  else substringHelper s start end []
+
+substringHelper s start end acc = 
+  if start >= end then
+    reverse acc
+  else
+    substringHelper s (start + 1) end (s[start] :: acc)
+
+/**
+ * Check if character is a digit.
+ */
+isDigit :: char -> bool
+isDigit c = c >= '0' && c <= '9'
+
+/**
+ * Check if character is alphabetic.
+ */
+isAlpha :: char -> bool
+isAlpha c = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
+
+/**
+ * Check if character is whitespace.
+ */
+isWhitespace :: char -> bool
+isWhitespace c = c == ' ' || c == '\t' || c == '\n' || c == '\r'
+
+/**
+ * Create a parse error.
+ */
+makeError :: LexerState -> string -> ParseError
+makeError state message = {
+  message = message,
+  location = currentLocation state,
+  errorCode = "LEXER_ERROR"
+}
+
+/**
+ * Get character at index.
+ */
+charAt :: string -> int -> char
+charAt s i = s[i]
+
+/**
+ * Convert character to string.
+ */
+stringOfChar :: char -> string
+stringOfChar c = [c]

@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Source Directory Structure
+
+This directory contains the AffineScript library source code.
+
+== Library Organization
+
+[cols="1,3,2"]
+|===
+| Library | Description | Status
+
+| `Kyaml/` | Kubernetes YAML processing | Draft
+| `Kyaml/Ast.affine` | Abstract Syntax Tree definitions | Draft
+| `Kyaml/Lexer.affine` | Lexer for KYAML | Draft
+| `Kyaml/Parser.affine` | Parser for KYAML | Draft
+| `Kyaml/Query/` | Query language implementations | Planned
+| `Kyaml/Lint/` | Lint rule infrastructure | Planned
+| `Kyaml/Schema/` | Kubernetes schema definitions | Planned
+| `Data/` | Generic data structures | Planned
+| `Text/` | Text processing utilities | Planned
+|===
+
+== Module Structure
+
+Each library module should:
+
+1. Begin with SPDX license identifier
+2. Include module documentation
+3. Define clear types and interfaces
+4. Follow AffineScript conventions
+
+== Naming Conventions
+
+* **Files**: `.affine` extension
+* **Modules**: PascalCase (matches file name)
+* **Types**: PascalCase
+* **Functions**: camelCase
+* **Constants**: SCREAMING_SNAKE_CASE
+
+== Import Structure
+
+[source,affine]
+----
+// Main module exports public API
+module Kyaml
+
+// Import submodules
+import Kyaml.Ast
+import Kyaml.Lexer
+import Kyaml.Parser
+----
+
+== Building
+
+Run `just build` from the repository root to build all libraries.
+
+== Testing
+
+Run `just test` to run all tests.
+
+Tests are located in the `tests/` directory with matching structure.

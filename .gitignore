@@ -1,0 +1,56 @@
+# SPDX-License-Identifier: CC0-1.0
+# SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+# Build artifacts
+build/
+dist/
+*.wasm
+*.wasi
+*.so
+*.dll
+*.exe
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Just
+.justfile.bak
+
+# Test artifacts
+.test-results/
+.bench-results/
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Backup files
+*.bak
+*~
+
+# Dependency directories
+node_modules/
+vendor/
+
+# AffineScript specific
+*.affinec
+*.affineo

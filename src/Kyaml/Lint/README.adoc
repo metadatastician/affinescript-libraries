@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Kyaml.Lint Module
+
+This module provides linting infrastructure for Kubernetes manifests.
+
+== Overview
+
+The Lint module provides pluggable lint rules for validating Kubernetes
+manifests against best practices and conventions.
+
+== Planned Lint Rules
+
+* Required fields validation
+* Type checking (field types must match K8s schema)
+* Deprecated API version warnings
+* `:latest` image tag detection
+* Selector consistency checking
+* Resource naming convention enforcement
+* Label key format validation
+
+== Usage
+
+[source,affine]
+----
+import Kyaml.Lint
+
+let yaml = "apiVersion: v1beta2\nkind: Deployment\n..."
+let issues = Kyaml.Lint.lint yaml
+
+if issues != [] then
+  for issue in issues do
+    printIssue issue
+----
+
+== Rule Architecture
+
+Each lint rule:
+
+* Has a unique identifier (e.g., `required-fields`)
+* Specifies severity (Error, Warning, Info)
+* Provides a clear message
+* Can specify location in the document
+* Can be enabled/disabled via configuration
+
+== Extending
+
+New rules can be added by implementing the `LintRule` interface:
+
+[source,affine]
+----
+module MyCustomRule
+
+import Kyaml.Lint
+
+myRule :: LintRule
+myRule = {
+  id = "my-custom-rule",
+  severity = Warning,
+  description = "My custom lint rule",
+  check = myCheckFunction
+}
+----

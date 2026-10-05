@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Kyaml.Schema Module
+
+This module provides Kubernetes schema definitions for validation.
+
+== Overview
+
+The Schema module contains type definitions and validation logic for
+Kubernetes resource types, enabling schema-aware parsing and validation.
+
+== Planned Schema Coverage
+
+* Core types (Pod, Service, Deployment, StatefulSet, etc.)
+* Networking types (Ingress, NetworkPolicy, etc.)
+* Config types (ConfigMap, Secret, etc.)
+* RBAC types (Role, ClusterRole, etc.)
+* Custom Resource Definitions
+
+== Usage
+
+[source,affine]
+----
+import Kyaml.Schema
+
+// Validate a document against a schema
+let yaml = "apiVersion: v1\nkind: Pod\n..."
+let result = Kyaml.Schema.validate yaml "v1.Pod"
+
+case result of
+  Ok _ -> putStrLn "✓ Valid"
+  Err errors -> printErrors errors
+----
+
+== Schema Definition Format
+
+Schemas are defined using AffineScript types with dependent type annotations
+for field validation:
+
+[source,affine]
+----
+// Example: PodSpec schema fragment
+type PodSpec = {
+  containers: Vec<Container>,
+  volumes: Option<Vec<Volume>>,
+  restartPolicy: RestartPolicy,
+  // ...
+}
+
+where RestartPolicy = Always | OnFailure | Never
+----
+
+== Integration with KYAML
+
+The schema system integrates with the KYAML parser to provide:
+
+* Type-aware parsing (coerce scalars to correct types)
+* Field presence validation
+* Enum value validation
+* Nested schema validation

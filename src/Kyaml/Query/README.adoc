@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Kyaml.Query Module
+
+This module provides query language support for KYAML documents.
+
+== Overview
+
+The Query module enables extracting, transforming, and manipulating data
+from KYAML documents using path-based queries.
+
+== Planned Features
+
+* Path-based queries (e.g., `.spec.replicas`)
+* Filter expressions (e.g., `[?(.kind == "Deployment")]`)
+* Array indexing and slicing
+* Function calls (e.g., `length`, `keys`)
+* jq compatibility layer
+
+== Usage
+
+[source,affine]
+----
+import Kyaml.Query
+
+// Query a value
+let yaml = "apiVersion: v1\nkind: Deployment\nspec:\n  replicas: 3"
+let result = Kyaml.Query.query yaml ".spec.replicas"
+
+// Set a value
+let newYaml = Kyaml.Query.set yaml ".spec.replicas" "5"
+
+// Delete a field
+let updatedYaml = Kyaml.Query.delete yaml ".metadata.labels.old-label"
+----

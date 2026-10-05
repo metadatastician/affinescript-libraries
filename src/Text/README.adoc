@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Text Library
+
+Text processing utilities for AffineScript.
+
+== Planned Modules
+
+* `Text.String` — String manipulation
+* `Text.Regex` — Regular expressions
+* `Text.Parser` — Parser combinators
+* `Text.Fmt` — Formatting utilities
+* `Text.Unicode` — Unicode handling
+
+== Planned Features
+
+* String splitting and joining
+* Pattern matching
+* Substring operations
+* Case conversion
+* Trimming and padding
+* Template expansion
+
+== Usage Example
+
+[source,affine]
+----
+import Text.String
+
+let input = "hello world"
+
+// Split by whitespace
+let parts = Text.String.split " " input
+
+// Join with commas
+let joined = Text.String.join ", " parts
+
+// Contains check
+let hasWorld = Text.String.contains input "world"
+
+// Starts with check
+let startsWithHello = Text.String.startsWith input "hello"
+----

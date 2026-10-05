@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// STATE.a2ml — Current state of affinescript-libraries
+// Format: A2ML (Attribute Assignment Markup Language)
+
+[identity]
+  uuid = "1773540351-0001-4000-8000-000000000000"
+  name = "affinescript-libraries"
+  inception = "2026-10-05"
+
+[versioning]
+  current = "0.1.0"
+  semantic = "MAJOR.MINOR.PATCH"
+  
+[phase]
+  status = "bootstrapping"
+  description = "Initial repository setup with basic library structure"
+  
+[components]
+  [components.kyaml]
+    status = "draft"
+    description = "Kubernetes YAML processing library"
+    files = ["src/Kyaml.affine", "src/Kyaml/Ast.affine", "src/Kyaml/Lexer.affine", "src/Kyaml/Parser.affine"]
+    
+  [components.kyaml_query]
+    status = "planned"
+    description = "Query language for KYAML"
+    
+  [components.kyaml_lint]
+    status = "planned"
+    description = "Lint rule infrastructure"
+    
+  [components.data]
+    status = "planned"
+    description = "Data structures library"
+    
+  [components.text]
+    status = "planned"
+    description = "Text processing utilities"
+
+[gates]
+  [gates.build]
+    status = "stub"
+    description = "Build system uses placeholder stubs until AffineScript compiler is ready"
+    
+  [gates.test]
+    status = "stub"
+    description = "Test infrastructure uses placeholders"
+    
+  [gates.validate]
+    status = "passing"
+    description = "RSR structure validation passes"
+
+[dependencies]
+  [dependencies.affinescript]
+    status = "blocking"
+    description = "AffineScript compiler needed to build libraries"
+    location = "hyper-repos/developer-ecosystem/affinescript-ecosystem/affinescript"
+    
+  [dependencies.kcq]
+    status = "watching"
+    description = "kcq tool depends on these libraries"
+    location = "../kcq"
+
+[build]
+  system = "just"
+  primary_target = "build"
+  artifacts = ["build/Kyaml", "build/Data", "build/Text"]
+
+[quality_metrics]
+  test_coverage = "0%"
+  documentation_coverage = "10%"
+  lint_clean = false
+
+[compliance]
+  rsrc_tier = "2"
+  rsrc_compliant = true
+  last_audited = "2026-10-05"

@@ -1,0 +1,315 @@
+// SPDX-License-Identifier: MPL-2.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// Kyaml.Ast — Abstract Syntax Tree definitions for KYAML
+//
+// This module defines the AST types for Kubernetes YAML parsing.
+// It is part of the AffineScript Libraries KYAML processing suite.
+
+module Kyaml.Ast
+
+// ============================================================================
+// AST Node Types
+// ============================================================================
+
+/**
+ * Represents a node in the KYAML AST.
+ */
+type Node
+  = NScalar of Scalar
+  | NSequence of list<Node>
+  | NMapping of Map<string, Node>
+  | NTag of string, Node
+  | NAnchor of string, Node
+  | NAlias of string
+
+/**
+ * Represents scalar values in YAML.
+ */
+type Scalar
+  = SString of string
+  | SInt of int
+  | SFloat of float
+  | SBool of bool
+  | SNull
+  | STimestamp of string
+
+/**
+ * Represents a Map data structure.
+ */
+type Map<K, V> = {
+  data: list<(K, V)>,
+  
+  isEmpty :: bool,
+  size :: int,
+  lookup :: K -> Option<V>,
+  insert :: K -> V -> Map<K, V>,
+  remove :: K -> Map<K, V>,
+  toList :: list<(K, V)>,
+  keys :: list<K>,
+  values :: list<V>
+}
+
+// ============================================================================
+// Map Implementation
+// ============================================================================
+
+/**
+ * Create an empty map.
+ */
+emptyMap :: Map<K, V>
+emptyMap = {
+  data = [],
+  isEmpty = true,
+  size = 0,
+  lookup = emptyLookup,
+  insert = emptyInsert,
+  remove = emptyRemove,
+  toList = emptyToList,
+  keys = emptyKeys,
+  values = emptyValues
+}
+
+emptyLookup _ = None
+emptyInsert k v = emptyMap
+emptyRemove _ = emptyMap
+emptyToList = []
+emptyKeys = []
+emptyValues = []
+
+/**
+ * Create a map from a list of key-value pairs.
+ */
+fromList :: list<(K, V)> -> Map<K, V>
+fromList pairs = 
+  let rec loop acc remaining = 
+    case remaining of
+      [] -> acc
+      ((k, v) :: xs) -> loop (insert acc k v) xs
+  in loop emptyMap pairs
+
+/**
+ * Insert a key-value pair into a map.
+ */
+insert :: Map<K, V> -> K -> V -> Map<K, V>
+insert m k v = 
+  case m.lookup k of
+    Some _ -> { m | data = (k, v) :: filter (\x -> fst x != k) m.data }
+    None -> { m | data = (k, v) :: m.data, isEmpty = false, size = m.size + 1 }
+
+/**
+ * Lookup a value by key.
+ */
+lookup :: Map<K, V> -> K -> Option<V>
+lookup m k = 
+  let rec loop remaining = 
+    case remaining of
+      [] -> None
+      ((key, val) :: xs) -> if key == k then Some val else loop xs
+  in loop m.data
+
+/**
+ * Remove a key from the map.
+ */
+remove :: Map<K, V> -> K -> Map<K, V>
+remove m k = 
+  { m | data = filter (\x -> fst x != k) m.data }
+
+/**
+ * Check if map is empty.
+ */
+isEmpty :: Map<K, V> -> bool
+isEmpty m = m.isEmpty
+
+/**
+ * Get the size of the map.
+ */
+size :: Map<K, V> -> int
+size m = m.size
+
+/**
+ * Convert map to list of key-value pairs.
+ */
+toList :: Map<K, V> -> list<(K, V)>
+toList m = m.data
+
+/**
+ * Get all keys from the map.
+ */
+keys :: Map<K, V> -> list<K>
+keys m = map fst m.data
+
+/**
+ * Get all values from the map.
+ */
+values :: Map<K, V> -> list<V>
+values m = map snd m.data
+
+// ============================================================================
+// KYAML Document Types
+// ============================================================================
+
+/**
+ * Represents a complete KYAML file (multi-document).
+ */
+type KYamlFile = {
+  docs: list<KYamlDoc>,
+  source: Option<string>
+}
+
+/**
+ * Represents a single KYAML document.
+ */
+type KYamlDoc
+  = KResource of KYamlResource
+  | KGeneric of Node
+
+/**
+ * Represents a Kubernetes resource.
+ */
+type KYamlResource = {
+  apiVersion: string,
+  kind: string,
+  metadata: ResourceMetadata,
+  spec: Node,
+  status: Option<Node>
+}
+
+/**
+ * Resource metadata.
+ */
+type ResourceMetadata = {
+  name: string,
+  namespace: Option<string>,
+  labels: Map<string, string>,
+  annotations: Map<string, string>,
+  uid: Option<string>,
+  generation: Option<int>,
+  creationTimestamp: Option<string>,
+  deletionTimestamp: Option<string>
+}
+
+// ============================================================================
+// Source Location
+// ============================================================================
+
+/**
+ * Represents a location in the source file.
+ */
+type SourceLocation = {
+  file: Option<string>,
+  line: int,
+  column: int,
+  offset: int
+}
+
+/**
+ * Represents a span (range) in the source file.
+ */
+type SourceSpan = {
+  start: SourceLocation,
+  end: SourceLocation
+}
+
+// ============================================================================
+// Error Types
+// ============================================================================
+
+/**
+ * Represents a parse error.
+ */
+type ParseError = {
+  message: string,
+  location: SourceLocation,
+  errorCode: string
+}
+
+/**
+ * Error codes for KYAML parsing.
+ */
+type ErrorCode
+  = UnexpectedToken
+  | UnexpectedEOF
+  | InvalidYAML
+  | InvalidKubernetes
+  | Custom of string
+
+// ============================================================================
+// Utility Types
+// ============================================================================
+
+/**
+ * Represents the result of an operation that can fail.
+ */
+type Result<T, E>
+  = Ok of T
+  | Err of E
+
+/**
+ * Option type for values that may be absent.
+ */
+type Option<T>
+  = Some of T
+  | None
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Map a function over an Option.
+ */
+map :: (a -> b) -> Option<a> -> Option<b>
+map f opt = 
+  case opt of
+    Some x -> Some (f x)
+    None -> None
+
+/**
+ * Get the first element of a pair.
+ */
+fst :: (a, b) -> a
+fst (x, _) = x
+
+/**
+ * Get the second element of a pair.
+ */
+snd :: (a, b) -> b
+snd (_, y) = y
+
+/**
+ * Filter a list by a predicate.
+ */
+filter :: (a -> bool) -> list<a> -> list<a>
+filter pred list = 
+  let rec loop acc remaining = 
+    case remaining of
+      [] -> reverse acc
+      (x :: xs) ->
+        if pred x then
+          loop (x :: acc) xs
+        else
+          loop acc xs
+  in loop [] list
+
+/**
+ * Reverse a list.
+ */
+reverse :: list<a> -> list<a>
+reverse list = 
+  let rec loop acc remaining = 
+    case remaining of
+      [] -> acc
+      (x :: xs) -> loop (x :: acc) xs
+  in loop [] list
+
+/**
+ * Map a function over a list.
+ */
+mapList :: (a -> b) -> list<a> -> list<b>
+mapList f list = 
+  let rec loop acc remaining = 
+    case remaining of
+      [] -> reverse acc
+      (x :: xs) -> loop (f x :: acc) xs
+  in loop [] list

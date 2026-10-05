@@ -1,0 +1,79 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+//
+// META.a2ml — Machine-readable metadata for affinescript-libraries
+// Format: A2ML (Attribute Assignment Markup Language)
+// Schema: https://github.com/hyperpolymath/rhodium-standard-repositories/blob/main/docs/a2ml/META-SCHEMA.a2ml
+
+name = "affinescript-libraries"
+version = "0.1.0"
+
+[owner]
+  type = "organization"
+  name = "metadatastician"
+  
+[repository]
+  type = "git"
+  forge = "github"
+  path = "metadatastician/affinescript-libraries"
+  
+[description]
+  short = "Reusable AffineScript libraries for KYAML processing and Kubernetes workflows"
+  long = """
+    AffineScript Libraries provides a collection of reusable libraries for the
+    AffineScript programming language, with a focus on Kubernetes YAML processing.
+    
+    This repository includes:
+    - KYAML: Kubernetes-native YAML parsing, querying, and manipulation
+    - Query: jq-like and custom query DSLs for data extraction
+    - Lint: Pluggable linting infrastructure for Kubernetes manifests
+    - Data: Common data structures (maps, sets, vectors)
+    - Text: Text processing and parsing utilities
+    
+    These libraries power the kcq (Kubernetes Configuration Query) tool.
+  """
+
+[classification]
+  primary_language = "AffineScript"
+  target_platform = "WebAssembly"
+  tier = "2"
+  
+[licensing]
+  code_license = "MPL-2.0"
+  docs_license = "CC-BY-SA-4.0"
+  
+[dependencies]
+  core = [
+    { name = "hyperpolymath/affinescript", version = "0.1.0", purpose = "language_compiler" },
+    { name = "metadatastician/kcq", version = "0.1.0", purpose = "primary_consumer" }
+  ]
+  
+[capabilities]
+  provided = [
+    "yaml_parsing",
+    "yaml_query",
+    "yaml_manipulation",
+    "kubernetes_validation",
+    "lint_rules"
+  ]
+  required = [
+    "affinescript_compiler"
+  ]
+
+[interfaces]
+  primary = "AffineScript_API"
+  ffi = ["C", "WASM"]
+
+[quality]
+  rsrc_compliant = true
+  rsrc_tier = "2"
+  ci_cd = "GitHub_Actions"
+  
+[community]
+  maintainers = ["hyperpolymath"]
+  contribution_policy = "open"
+  
+[ecosystem]
+  domain = "programming_languages"
+  subdomain = "affinescript"
+  maturity = "alpha"

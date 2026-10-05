@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+
+= Data Library
+
+Generic data structures for AffineScript.
+
+== Planned Types
+
+* `Vec<T>` — Dynamic arrays
+* `Map<K, V>` — Hash maps / dictionaries
+* `Set<T>` — Hash sets
+* `Option<T>` — Optional values
+* `Result<T, E>` — Error handling
+* `Either<A, B>` — Sum types
+
+== Planned Modules
+
+* `Data.Vec` — Vector operations
+* `Data.Map` — Map operations
+* `Data.Set` — Set operations
+* `Data.Json` — JSON serialization
+* `Data.Yaml` — Generic YAML support
+
+== Usage Example
+
+[source,affine]
+----
+import Data.Vec
+import Data.Map
+
+// Create a vector
+let vec = Vec.fromList [1, 2, 3, 4, 5]
+
+// Map over it
+let doubled = Vec.map (\x -> x * 2) vec
+
+// Create a map
+let map = Map.empty |> Map.insert "key1" "value1" |> Map.insert "key2" "value2"
+
+// Lookup a value
+let value = Map.lookup map "key1"
+----
