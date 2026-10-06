@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= affinescript-libraries architecture
+:toc: preamble
+
+affinescript-libraries is a collection of reusable libraries for the
+AffineScript programming language (https://github.com/hyperpolymath/affinescript).
+This page describes the repository as it stands. Most libraries are still
+drafts or plans; `src/README.adoc` carries the per-module status table.
+
+== Repository layout
+
+[cols="1,3",options="header"]
+|===
+| Path | Contents
+
+| `src/`
+| Library sources. `src/Kyaml.affine` is the KYAML module root.
+
+| `src/Kyaml/`
+| Kubernetes YAML processing: `Lexer.affine`, `Parser.affine` and
+`Ast.affine` (drafts), with the planned `Query/`, `Lint/` and `Schema/`
+sub-libraries.
+
+| `src/Data/`
+| Generic data structures (planned).
+
+| `src/Text/`
+| Text processing utilities (planned).
+
+| `.machine_readable/`
+| Machine-readable repository descriptions and contracts.
+
+| `.github/`
+| Workflows, community-health files and governance.
+|===
+
+== Module conventions
+
+Each library is an AffineScript module whose name matches its file name
+(`.affine`), and a library's root module re-exports its submodules (for
+example `module Kyaml` imports `Kyaml.Ast`). See `src/README.adoc`.
+
+== Build
+
+The `Justfile` is the build entry point. Building requires the AffineScript
+toolchain.
