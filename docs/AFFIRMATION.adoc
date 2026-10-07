@@ -4,8 +4,16 @@
 :toc: macro
 :toclevels: 2
 :std-docs: https://github.com/hyperpolymath/standards/blob/main/docs
+:status: DRAFT
 
 _the No-Bullshit file: what we affirm was true and checkable at this moment._
+
+[WARNING]
+====
+*DRAFT, not yet affirmed.* An agent drafted this file and ran every check in it, but an
+agent must not sign an affirmation. It becomes an affirmation when the owner reviews it,
+deletes the `:status: DRAFT` line and this block, and lands it with `git commit -S -s`.
+====
 
 This file conforms to *profile A (evidential)* of the
 link:{std-docs}/AFFIRMATION-STANDARD.adoc[AFFIRMATION authoring standard]. It is the
