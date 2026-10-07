@@ -1,0 +1,204 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// SPDX-FileCopyrightText: 2026 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= AFFIRMATION — AffineScript Libraries, as of 2026-10-07
+:toc: macro
+:toclevels: 2
+:std-docs: https://github.com/hyperpolymath/standards/blob/main/docs
+:status: DRAFT
+
+_the No-Bullshit file: what we affirm was true and checkable at this moment._
+
+[WARNING]
+====
+*DRAFT, not yet affirmed.* An agent drafted this file and ran every check in it, but an
+agent must not sign an affirmation. It becomes an affirmation when the owner reviews it,
+deletes the `:status: DRAFT` line and this block, and lands it with `git commit -S -s`.
+====
+
+This file conforms to *profile A (evidential)* of the
+link:{std-docs}/AFFIRMATION-STANDARD.adoc[AFFIRMATION authoring standard]. It is the
+third of the README / EXPLAINME / AFFIRMATION trio: README says where this is going,
+this file says what was true and checkable at one commit.
+
+toc::[]
+
+== What this is, and how it works
+
+*What it is.* A short, dated, signed snapshot of what Jonathan D.A. Jewell can honestly
+and verifiably claim about *AffineScript Libraries* at one exact commit. Nothing here is
+marketing and nothing is a promise about the future. Those live in the README.
+
+*What the project is.* A planned collection of reusable AffineScript libraries, starting
+with KYAML (Kubernetes-flavoured YAML) processing, intended as the core of
+https://github.com/metadatastician/kcq[kcq].
+
+*How it stays trustworthy.* Every claim below was produced by running a command in the
+session that wrote this file. The anchor names the exact commit. The file is landed by a
+signed commit.
+
+*We are fallible.* This is our best honest belief, not a proof of its own correctness.
+
+== The epistemic contract (read this before you trust _or_ attack)
+
+This document records the owner's *best belief* at the timestamp below. It is *not a
+guarantee of correctness*. The only guarantee is *no intentional overclaim*.
+
+You may conclude that every claim below was produced by running the tool in the session
+that wrote this file, and that where a live run disagreed with the README, the live run
+won and the README is named in <<outstanding>>.
+
+You may *not* conclude that anything is true *now*, or that unlisted things pass.
+*Silence is not a claim.*
+
+*Standing invitation to refute.* Bring a counter-example, a failing run, or a
+contradicting source.
+
+[#verifiable-anchor]
+== Verifiable anchor
+
+[cols="1,3",options="header"]
+|===
+| Field | Value
+
+| Project
+| AffineScript Libraries
+
+| Repo
+| `metadatastician/affinescript-libraries`
+
+| Branch
+| `main`
+
+| Commit (HEAD)
+| `0638859cf0f4d7e4f6b96f2c8b107721bee6a87a`
+
+| Permalink
+| https://github.com/metadatastician/affinescript-libraries/tree/0638859cf0f4d7e4f6b96f2c8b107721bee6a87a
+
+| Verified (UTC)
+| `2026-10-07T10:22:43Z`
+
+| Working-tree delta at verification
+| `clean` (`git status --porcelain` printed nothing).
+
+| Toolchain
+| `affinescript 0.1.1`, binary built 2026-10-06 from a working tree of
+  `hyperpolymath/affinescript` at `fefac21f935551581e60915c204a49ecec1c142e` that had
+  35 uncommitted changes; `just 1.56.0`.
+
+| Affirmed by
+| Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+|===
+
+[IMPORTANT]
+====
+*Never anchor to a tag.* If you are reading this at a later commit, the claims may have
+drifted. Re-run <<reproduce>> and write a fresh affirmation.
+====
+
+== Companion documents and repo metadata (cross-check)
+
+* `README.adoc` — the aspirational claims this file is measured against. It lists five
+  capability areas; at the anchor, four of them hold only a `README.adoc` (see
+  <<outstanding>>).
+* `docs/ARCHITECTURE.adoc` — the intended structure.
+* GitHub repo description — it describes the same five areas in the present tense. It is
+  aspiration, not state.
+* There is no `docs/EXPLAINME.adoc` yet.
+
+== The honest state (one breath)
+
+At the anchor this is a design-stage repository. The KYAML lexer, AST and parser exist as
+1,375 lines of AffineScript in four files, and none of them parses under the current
+compiler. The build and test recipes are placeholders and do not run under the current
+`just`. The repository's CI is healthy: all seven workflows that run on `main` start and
+pass.
+
+=== What is solid (and how we checked)
+
+[cols="2,1,3",options="header"]
+|===
+| Claim | Status | Evidence (command, and what it printed)
+
+| All 7 workflows on `main` start and pass (lock-sync-gate, deed-validate, sonarqube,
+  k9-validate, secret-scanner, rust-ci, governance)
+| affirmed
+| GraphQL `checkSuites` on `0638859c`: each `COMPLETED SUCCESS`, with 1, 1, 1, 1, 3, 5
+  and 15 check runs respectively
+
+| The secret scanner (gitleaks) runs, alongside GitGuardian
+| affirmed
+| secret-scanner suite: 3 runs (`gitleaks`, `shell-secrets`, `rust-secrets`), SUCCESS.
+  Before PR #3 it was STARTUP_FAILURE on every commit since the first.
+
+| The KYAML sources exist
+| affirmed
+| `wc -l src/Kyaml.affine src/Kyaml/{Ast,Lexer,Parser}.affine` — 417, 315, 315, 328;
+  1,375 total
+|===
+
+=== The honest nuance you must not lose
+
+* *rust-ci passing is not a Rust test.* There is no `Cargo.toml`. Its detect job succeeds
+  and the four Rust jobs are skipped.
+* *"PASS" in the Justfile is printed text.* `test-kyaml` runs `echo "KYAML tests: PASS
+  (placeholder)"`. `build-kyaml` copies the sources and writes a stub file. Neither
+  invokes a compiler.
+
+=== Known-incomplete but honestly fenced
+
+* *The capability areas that have no code* (Query, Lint, Schema, Data, Text) fail
+  loudly, in the sense that there is nothing to import. Each directory holds only a
+  `README.adoc`.
+
+[#outstanding]
+=== Outstanding / weak / refuted (no spin)
+
+* *Refuted: "the KYAML sources compile".* `affinescript check <file>` exits 124 on all
+  four files with `parse error: Syntax error`, at `src/Kyaml.affine:12:8` and at line
+  9:14 of each of the other three. Each of those lines is the `module …` declaration.
+  The sources predate the current compiler grammar.
+* *Refuted: "the Justfile runs".* `just test` and `just --list` exit 1 with `error:
+  recipe line has extra leading whitespace` at `Justfile:61:2`.
+* *Aspiration, not state:* README §"What this is" and the GitHub description list query
+  DSLs, lint rules, data structures and FFI bindings in the present tense. None exists at
+  the anchor.
+* *Not checked:* whether kcq consumes this repository today.
+
+[#reproduce]
+== Reproduce it yourself
+
+[source,bash]
+----
+git clone https://github.com/metadatastician/affinescript-libraries
+cd affinescript-libraries
+git checkout 0638859cf0f4d7e4f6b96f2c8b107721bee6a87a
+wc -l src/Kyaml.affine src/Kyaml/*.affine      # 1375 total
+for f in src/Kyaml.affine src/Kyaml/*.affine; do
+  affinescript check "$f"; echo "rc=$?"         # parse error, rc=124, each file
+done
+just test; echo "rc=$?"                         # extra leading whitespace, rc=1
+gh api graphql -f query='{repository(owner:"metadatastician",name:"affinescript-libraries"){object(oid:"0638859cf0f4d7e4f6b96f2c8b107721bee6a87a"){... on Commit{checkSuites(first:60){nodes{conclusion workflowRun{file{path}} checkRuns{totalCount}}}}}}}'
+----
+
+== One-line characterisation (quote this)
+
+> A design-stage AffineScript library repo with green, honest CI and a KYAML parser
+> draft that does not yet parse under the current compiler.
+
+== Joint attestation
+
+We, the undersigned, assert that *to the best of our joint belief at the timestamp above,
+every claim in this file is true and was checked as described*, with no intentional
+overclaim, and with the open gaps stated rather than hidden.
+
+* *Engineering party (AI):* `claude-opus-5-5` (Claude Code) — ran the checks recorded
+  here at `2026-10-07T10:22:43Z` and stands behind the wording above as a faithful report
+  of those runs.
+* *Owner / maintainer:* Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk> — _signs by
+  committing this file with `-S`; the git commit signature over this content is the
+  cryptographic form of this affirmation._
+
+_Landed by a signed git commit. Verify with `git log --show-signature` that the anchor
+SHA above matches the parent of the commit that introduced this affirmation. If they do
+not match, this file is a *draft* and must be read as one._
