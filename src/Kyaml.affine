@@ -7,7 +7,7 @@
 // It provides a high-level API for parsing, linting, and querying Kubernetes YAML.
 //
 // Part of: affinescript-libraries (https://github.com/metadatastician/affinescript-libraries)
-// Used by: kcq (https://github.com/metadatastician/kcq)
+// Used by: kyq (https://github.com/metadatastician/kyq)
 
 module Kyaml
 

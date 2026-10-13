@@ -46,7 +46,7 @@ ls src/
 |===
 | Library | Description
 
-| `Kyaml/` | Kubernetes YAML processing (core kcq functionality)
+| `Kyaml/` | Kubernetes YAML processing (core kyq functionality)
 | `Kyaml/Query/` | Query language implementations
 | `Kyaml/Lint/` | Lint rule collections
 | `Kyaml/Schema/` | Kubernetes schema definitions
@@ -56,10 +56,10 @@ ls src/
 | `Yaml/` | Generic YAML support (non-K8s)
 |===
 
-== Usage with kcq
+== Usage with kyq
 
-This library is the upstream source for the kcq tool's core functionality.
-The https://github.com/metadatastician/kcq[kcq] tool uses libraries from here.
+This library is the upstream source for the kyq tool's core functionality.
+The https://github.com/metadatastician/kyq[kyq] tool uses libraries from here.
 
 To use these libraries in your own AffineScript project:
 
@@ -129,7 +129,7 @@ See link:LICENSE[LICENSE] for the full license text.
 == Related Projects
 
 * https://github.com/hyperpolymath/affinescript[AffineScript] — The language
-* https://github.com/metadatastician/kcq[kcq] — Kubernetes Configuration Query tool
+* https://github.com/metadatastician/kyq[kyq] — Kubernetes YAML Query tool
 * https://github.com/metadatastician/affinescript-ecosystem[affinescript-ecosystem] — Ecosystem coordination
 
 == Repository Metadata
