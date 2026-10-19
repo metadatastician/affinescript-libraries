@@ -55,7 +55,7 @@ pins), and gitleaks in CI catches a genuine SonarCloud token as `generic-api-key
 
 == SAST tools are complementary, not redundant
 
-* `codeql.yml` — CodeQL (matrix defaults to `actions`; every repo has workflows).
+* CodeQL — GitHub's default setup (repository settings), not a workflow file here.
 * `sonarqube.yml` — SonarCloud (shell / JS surface; see `sonar-project.properties`).
 * `static-analysis-gate.yml` — panic-attack + Hypatia gate (see above).
 
